@@ -150,7 +150,7 @@ def AC_LAI(fname, mcd43 = '~/MCD43/',vrt_dir = '~/MCD43_VRT/', jasmin=False, aoi
     jasmin is only for UK jasmin computing platform
     '''
     siacJson = os.path.join(fname, 'siac_output.json')
-    B02 = glob(os.path.join(fname, '/GRANULE/*/IMG_DATA/*B02_sur.tif'))
+    B02 = glob(os.path.join(fname, 'GRANULE/*/IMG_DATA/*B02_sur.tif'))
     
     if len(B02) == 0:
         SIAC_S2(fname, 
