@@ -162,8 +162,8 @@ def AC_LAI(fname, mcd43 = '~/MCD43/',vrt_dir = '~/MCD43_VRT/', jasmin=False, aoi
                ) 
     else:
         logger.info('Atmospheric correction has been done for %s'%(os.path.basename(fname)))
-        if not os.path.exists(siacJson):
-            summeryJson(os.path.dirname(B02[0]))
+    if not os.path.exists(siacJson):
+        summeryJson(os.path.dirname(B02[0]))
             
     with open(siacJson, 'r') as f:
         siacOutput = json.load(f)
