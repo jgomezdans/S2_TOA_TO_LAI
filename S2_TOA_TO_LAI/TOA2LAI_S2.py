@@ -6,6 +6,7 @@ warnings.filterwarnings("ignore")
 import subprocess
 import numpy as np
 from glob import glob
+from pathlib import Path
 from SIAC import SIAC_S2
 from .nnModel import predict
 from .query import getS2Files
@@ -144,6 +145,21 @@ def summeryJson(dest):
     s2_tile_dir = '/'.join(dest.split('/')[:-3])
     with open(s2_tile_dir + '/siac_output.json', 'w') as f:
         json.dump(txt, f, ensure_ascii=False, indent=4)
+
+def need_to_do_AC(fname):
+    fich = Path(fname)
+    has_log = [f for f in fich.rglob ("**/SIAC_S2.log")]
+
+    if len(has_log) > 0:
+        logger.info("Have found a log file...")
+        if (has_log[0].read_text().split("\n")[-1]).find("Done") < 0:
+            logger.info("AC didn't finish successfully...")
+            return True
+        else:
+            return False
+    else:
+        logger.info("No AC log file...")
+        return True
         
 def AC_LAI(fname, mcd43 = '~/MCD43/',vrt_dir = '~/MCD43_VRT/', jasmin=False, aoi = None, ):
     '''
@@ -151,15 +167,16 @@ def AC_LAI(fname, mcd43 = '~/MCD43/',vrt_dir = '~/MCD43_VRT/', jasmin=False, aoi
     '''
     siacJson = os.path.join(fname, 'siac_output.json')
     B02 = glob(os.path.join(fname, 'GRANULE/*/IMG_DATA/*B02_sur.tif'))
-    
-    if len(B02) == 0:
+    if need_to_do_AC(fname):
+        logger.info("Will perform atmospheric correction...")
         SIAC_S2(fname, 
                 send_back = False, 
                 mcd43     = mcd43 , 
                 vrt_dir   = vrt_dir, 
                 jasmin    = jasmin,
                 aoi       = aoi, 
-               ) 
+               )
+        B02 = glob(os.path.join(fname, 'GRANULE/*/IMG_DATA/*B02_sur.tif'))
     else:
         logger.info('Atmospheric correction has been done for %s'%(os.path.basename(fname)))
     if not os.path.exists(siacJson):
