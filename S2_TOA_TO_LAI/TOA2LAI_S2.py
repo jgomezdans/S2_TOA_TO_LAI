@@ -227,13 +227,14 @@ def AC_LAI(fname, mcd43 = '~/MCD43/',vrt_dir = '~/MCD43_VRT/', jasmin=False, aoi
         # T means transformed for NN input
         Tvza = np.cos(np.deg2rad(nnInputs[-3][1] / 100.))
         Tsza = np.cos(np.deg2rad(nnInputs[-2][1]  / 100.))
-        Traa = nnInputs[-3][0] - nnInputs[-2][0]
+        Traa = (nnInputs[-3][0] - nnInputs[-2][0])/100.       
+ 
+        Traa[Traa<0]   = Traa[Traa<0]   + 360
+        Traa[Traa>360] = Traa[Traa>360] - 360
+        Traa = Traa / 360.
         
-        Traa[Traa<0] = Traa[Traa<0] + 360
-        Traa = (Traa / 100.) / 360.
-        
-        surs = np.array(nnInputs[:-3])
-        
+        surs = np.array(nnInputs[:-3])       
+ 
         mask = (nnInputs[-1] < 40) & (np.all(surs > 0, axis=0))
         
         nnInput = np.vstack([surs / 10000, [Tsza, Tvza, Traa]])
